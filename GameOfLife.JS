@@ -9,7 +9,6 @@ for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
 }
 
 var canvas = document.getElementById('myCanvas'),
-
     cw = canvas.width,
     ch = canvas.height,
     cx = null,
@@ -22,6 +21,16 @@ var canvas = document.getElementById('myCanvas'),
     currentTime = 0,
     delta = 0;
 
+var context = canvas.getContext('2d');
+
+canvas.addEventListener('mouseup', function(evt) {
+    var mousePos = getMousePos(canvas, evt);
+    message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+    setGrid(mousePos.x, mousePos.y);
+    },
+
+    false);
+
 //change declaration to variable values
 var grid = new Array(gridWidth);
 
@@ -32,13 +41,19 @@ for (var i = 0; i < gridWidth; i++) {
     }
 }
 
+
+if (typeof (canvas.getContext) !== undefined) {
+    cx = canvas.getContext('2d');
+    gameLoop();
+}
+
 function setSquare(x,y){
     grid[x][y][0] = grid[x][y][1];
     grid[x][y][1] = 0;
 }
 
 function checkBounds(value, bounds){
-    
+
     if(value < 0){
         return bounds - 1
     }
@@ -47,7 +62,7 @@ function checkBounds(value, bounds){
         return 0;
     }
 
-    return value;         
+    return value;
 }
 
 function pause(){
@@ -59,11 +74,11 @@ function getGrid(x,y){
         return grid[checkBounds(x, gridWidth)][checkBounds(y, gridHeight)][0];
     }
     else{
-        
+
         if((checkBounds(x, gridWidth) != x) || checkBounds(y, gridHeight) != y){
             return 0;
         }
-        
+
         else{
             return grid[x][y][0];
         }
@@ -72,16 +87,16 @@ function getGrid(x,y){
 }
 
 function checkSquare(x, y){
-    
-    var adjacent = 
 
-            getGrid(x-1,y-1) + 
-            getGrid(x-1,y) + 
+    var adjacent =
+
+            getGrid(x-1,y-1) +
+            getGrid(x-1,y) +
             getGrid(x-1,y+1) +
-            getGrid(x,y-1) + 
+            getGrid(x,y-1) +
             getGrid(x,y+1) +
-            getGrid(x+1,y-1) + 
-            getGrid(x+1,y) + 
+            getGrid(x+1,y-1) +
+            getGrid(x+1,y) +
             getGrid(x+1,y+1);
 
     if(adjacent == 2){
@@ -113,9 +128,10 @@ function drawGrid(x,y){
         cx.fillRect(x*20+2,y*20+2,16,16);
         cx.rect(x*20+2,y*20+2,16,16);
         cx.stroke();
-}              
+    }
+}
 
-function gameLoop() {
+function gameLoop(){
 
     window.requestAnimationFrame(gameLoop);
     currentTime = (new Date()).getTime();
@@ -123,7 +139,7 @@ function gameLoop() {
     cx.clearRect(0, 0, cw, cw);
     runGrid(drawGrid);
 
-    if(running == true && currentTime- lastTime > 200){                            
+    if(running == true && currentTime- lastTime > 200){
         runGrid(checkSquare);
         runGrid(setSquare);
         lastTime = currentTime;
@@ -135,7 +151,7 @@ function setGrid(x,y){
     grid[x][y][0] = !grid[x][y][0];
 }
 
-function getMousePos(canvas, evt) {
+function getMousePos(canvas, evt){
 
     var rect = canvas.getBoundingClientRect();
 
@@ -146,18 +162,6 @@ function getMousePos(canvas, evt) {
 
 }
 
-var canvas = document.getElementById('myCanvas');
-var context = canvas.getContext('2d');
 
-canvas.addEventListener('mouseup', function(evt) {
-    var mousePos = getMousePos(canvas, evt);
-    message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
-    setGrid(mousePos.x, mousePos.y);
-    }, 
 
-    false);
 
-if (typeof (canvas.getContext) !== undefined) {
-    cx = canvas.getContext('2d');            
-    gameLoop();
-}
